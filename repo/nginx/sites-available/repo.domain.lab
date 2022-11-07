@@ -1,0 +1,10 @@
+server {
+  listen 80;
+  root /var/www/repo.domain.lab/html;
+  index index.html;
+  server_name repo.domain.lab;
+  location / {
+    try_files $uri $uri/ =404;
+    autoindex on;
+  }
+}

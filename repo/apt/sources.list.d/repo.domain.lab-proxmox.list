@@ -1,0 +1,2 @@
+deb http://repo.domain.lab/proxmox/debian/pve bullseye pve-no-subscription
+deb http://repo.domain.lab/proxmox/debian/pbs bullseye pbs-no-subscription

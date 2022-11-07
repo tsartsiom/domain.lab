@@ -1,0 +1,3 @@
+deb http://repo.domain.lab/debian bullseye main contrib non-free
+deb http://repo.domain.lab/debian-security bullseye-security main contrib non-free
+deb http://repo.domain.lab/debian bullseye-updates main contrib non-free
