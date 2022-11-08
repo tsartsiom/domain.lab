@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://v8.1c.ru/v8/tech-log">
+	<dump create="false" type="0" prntscrn="false"/>
+	<log history="168" location="C:\log_1С">
+		<property name="all"/>
+		<event>
+			<eq property="name" value="TDEADLOCK"/>
+		</event>
+		<event>
+			<eq property="name" value="TTIMEOUT"/>
+		</event>
+		<event>
+			<eq property="name" value="QERR"/>
+		</event>
+		<event>
+			<eq property="name" value="EXCP"/>
+		</event>
+		<event>
+			<eq property="name" value="EXCPCNTX"/>
+		</event>
+	</log>
+</config>
