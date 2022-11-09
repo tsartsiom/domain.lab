@@ -11,11 +11,14 @@ sudo dpkg -i vlmcsd_1113_amd64.deb
 sudo mkdir /var/log/vlmcsd
 sudo useradd -s /usr/sbin/nologin -r -M vlmcsd
 sudo chown -R vlmcsd:vlmcsd /var/log/vlmcsd
+
 # Указываем LogFile = /var/log/vlmcsd/vlmcsd.log
 sudo nano /etc/vlmcsd/vlmcsd.ini
+
 # Указываем vlmcsd в качестве юзера и группы для [Service]
 sudo systemctl edit vlmcsd.service
 sudo systemctl restart vlmcsd.service
+
 # проверяем порты и логи
 sudo ss -tulnp | grep 1688
 sudo tail /var/log/vlmcsd/vlmcsd.log

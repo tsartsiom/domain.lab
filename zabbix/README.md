@@ -2,7 +2,7 @@
 
 ### Создание пользователя
 
-Не рекомендуется подключаться по SSH под рутом. Для этого создаем пользователя *zabbix* при установке системы или после. Затем устанавливаем пакет *sudo* и включаем в группу *sudo* пользователя *zabbix*.
+Не рекомендуется подключаться по SSH под рутом. Для этого создаем пользователя *zabbix* при установке системы или после. Также устанавливаем пакет *sudo* и включаем в группу *sudo* пользователя *zabbix*.
 
 ```bash
 apt install sudo
@@ -24,18 +24,22 @@ sudo sed 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' -i /etc/ssh/
 ```bash
 mkdir ~/.ssh && chmod 700 ~/.ssh
 touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+
 # добавляем наш публичный ключ
 nano .ssh/authorized_keys
 ```
 
 ### Установка сетевых параметров, имени компьютера
 
+Изменяем имя хоста, устанавливаем часовой пояс
+
 ```bash
 sudo hostnamectl set-hostname zabbix.domain.lab
 sudo timedatectl set-timezone Europe/Minsk
 ```
 
-`sudo nano /etc/network/interfaces`:
+Настраиваем сетевой адрес  `sudo nano /etc/network/interfaces`
+
 ```bash
 auto enp0s3
 iface enp0s3 inet static
@@ -44,7 +48,8 @@ iface enp0s3 inet static
   gateway 192.168.0.254
 dns-nameservers 192.168.69.1 192.168.69.2
 ```
-`sudo systemctl restart networking`
+
+Перезапускаем сетевую службу `sudo systemctl restart networking`
 
 ### Отключение IPv6
 
@@ -71,7 +76,6 @@ GRUB_CMDLINE_LINUX="ipv6.disable=1"
 sudo update-grub
 ```
 
-
 ### Настройка хранения истории в *bash_history*
 
 Первый параметр увеличивает размер файла до 10000 строк. Можно сделать и больше, хотя обычно хватает такого размера. Второй параметр указывает, что необходимо сохранять дату и время выполнения команды. Третья строка вынуждает сразу же после выполнения команды сохранять ее в историю. В последней строке мы создаем список исключений для тех команд, запись которых в историю не требуется.
@@ -86,10 +90,17 @@ EOF
 ```
 
 ### Отключение флуда сообщений в */var/log/messages*
+
+Создаем файл конфигурации */etc/rsyslog.d/ignore-systemd-session-slice.conf*
 ```bash
 sudo bash -c "cat > /etc/rsyslog.d/ignore-systemd-session-slice.conf" << EOF
 if \$programname == "systemd" and (\$msg contains "Starting Session" or \$msg contains "Started Session" or \$msg contains "Created slice" or \$msg contains "Starting user-" or \$msg contains "Starting User Slice of" or \$msg contains "Removed session" or \$msg contains "Removed slice User Slice of" or \$msg contains "Stopping User Slice of") then stop
 EOF
+```
+
+Перезапускаем службу
+
+```bash
 sudo systemctl restart rsyslog
 ```
 
@@ -171,7 +182,7 @@ quit;
 ```bash
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
 ```
-Отключение *log_bin_trust_function_creators* опции после импорта схемы и данных
+После импорта схемы и данных отключаем *log_bin_trust_function_creators*
 
 ```bash
 mysql -uroot -p
@@ -200,7 +211,7 @@ listen 80;
 server_name zabbix.domain.lab;
 ```
 
-Перезагружаем службы, отключаем дефолтный сайт
+Отключаем дефолтный сайт, перезагружаем службы
 
 ```bash
 sudo rm -f /etc/nginx/sites-enabled/default

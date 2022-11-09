@@ -59,7 +59,7 @@ Import-Module -Name GPWmiFilter
 New-GPWmiFilter -Name 'Only x64 OS' -Expression 'SELECT * FROM Win32_OperatingSystem WHERE OSArchitecture LIKE "64%"'
 New-GPWmiFilter -Name 'Only x86 OS' -Expression 'SELECT * FROM Win32_OperatingSystem WHERE NOT OSArchitecture LIKE "64%"'
 New-GPWmiFilter -Name 'Windows 7-8 and Servers 2008-2012' -Expression 'SELECT * FROM Win32_OperatingSystem WHERE Version LIKE "6.1%" OR Version LIKE "6.2%"'
-New-GPWmiFilter -Name 'Windows 7-10 ' -Expression 'SELECT * FROM Win32_OperatingSystem WHERE (Version LIKE "10.0%" OR Version LIKE "6.3%" OR Version LIKE "6.2%" OR Version LIKE "6.1%") AND ProductType = 1'
+New-GPWmiFilter -Name 'Windows 7-10' -Expression 'SELECT * FROM Win32_OperatingSystem WHERE (Version LIKE "10.0%" OR Version LIKE "6.3%" OR Version LIKE "6.2%" OR Version LIKE "6.1%") AND ProductType = 1'
 # MSFT GPOs
 Import-GPO -BackupId "{DD304A7D-15A7-42B7-AB52-2338F4ECE2C7}" -Path "$gpoDir\MSFT" -TargetName "MSFT Windows 10 21H2 - Computer" -CreateIfNeeded | Out-Null
 Import-GPO -BackupId "{4B6589C2-0290-4764-8058-9825B56B4169}" -Path "$gpoDir\MSFT" -TargetName "MSFT Windows 10 21H2 - User" -CreateIfNeeded | Out-Null

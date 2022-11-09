@@ -2,7 +2,7 @@
 
 ### Создание пользователя
 
-Не рекомендуется подключаться по SSH под рутом. Для этого создаем пользователя *repoadmin* при установке системы или после. Затем устанавливаем пакет *sudo* и включаем в группу *sudo* пользователя *repoadmin*.
+Не рекомендуется подключаться по SSH под рутом. Для этого создаем пользователя *repoadmin* при установке системы или после. Также устанавливаем пакет *sudo* и включаем в группу *sudo* пользователя *repoadmin*.
 
 ```bash
 apt install sudo
@@ -24,18 +24,22 @@ sudo sed 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' -i /etc/ssh/
 ```bash
 mkdir ~/.ssh && chmod 700 ~/.ssh
 touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+
 # добавляем наш публичный ключ
 nano .ssh/authorized_keys
 ```
 
 ### Установка сетевых параметров, имени компьютера
 
+Изменяем имя хоста, устанавливаем часовой пояс
+
 ```bash
 sudo hostnamectl set-hostname repo.domain.lab
 sudo timedatectl set-timezone Europe/Minsk
 ```
 
-`sudo nano /etc/network/interfaces`:
+Настраиваем сетевой адрес  `sudo nano /etc/network/interfaces`
+
 ```bash
 auto enp0s3
 iface enp0s3 inet static
@@ -44,7 +48,8 @@ iface enp0s3 inet static
   gateway 192.168.0.254
 dns-nameservers 192.168.69.1 192.168.69.2
 ```
-`sudo systemctl restart networking`
+
+Перезапускаем сетевую службу `sudo systemctl restart networking`
 
 ### Отключение IPv6
 
@@ -70,7 +75,6 @@ GRUB_CMDLINE_LINUX="ipv6.disable=1"
 ```bash
 sudo update-grub
 ```
-
 
 ### Настройка хранения истории в *bash_history*
 
@@ -200,7 +204,7 @@ clean https://packages.matrix.org/debian
 
 Файлы репозитория можно хранить как внутри виртуальной машины `repo`, так и в общей папке сервера `fs1`.
 
-Для подлючения к файловой шаре создаем файл с реквизитами доступа к файловому серверу:
+Для подключения к файловой шаре создаем файл с реквизитами доступа к файловому серверу:
 
 ```bash 
 sudo bash -c "cat > /home/.smbcredentials" << EOF
@@ -306,6 +310,7 @@ sudo dpkg --install libtevent0_0.10.2-1_amd64.deb
 sudo dpkg --install libwbclient0_4.13.13+dfsg-1~deb11u5_amd64.deb
 sudo dpkg --install cifs-utils_6.11-3.1+deb11u1_amd64.deb
 sudo dpkg --install keyutils_1.6.1-2_amd64.deb
+
 # Создание локального репозитория после подлкючения к шаре
 sudo bash -c "cat > /etc/apt/sources.list.d/local-repo.list" << EOF
 deb file:/media/share/mirror/mirror.datacenter.by/debian bullseye main contrib non-free
