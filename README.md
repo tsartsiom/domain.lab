@@ -2,10 +2,9 @@
 
 Приведен пример создания локальной вычислительной сети небольшой организации на базе **Microsoft Active Directory** и **VMware vSphere 7**
 
-## Входные данные
+## Описание
 - сеть `192.168.69.0/24`
 - домен Active Directory `domain.lab`
-- домен vCenter Single Sign-On `vsphere.local`
 - Windows серверы `Windows Server 2022`
 - Linux серверы `Debian 11`
 
@@ -52,3 +51,21 @@
 ### Proxmox
 - [Установка Proxmox VE на Debian 11 Bullseye](https://pve.proxmox.com/wiki/Install_Proxmox_VE_on_Debian_11_Bullseye)
 - [Документация Proxmox Backup](https://pbs.proxmox.com/docs/)
+
+## Разное
+
+**Сводка безопасности [MS14-025](https://support.microsoft.com/en-us/topic/ms14-025-vulnerability-in-group-policy-preferences-could-allow-elevation-of-privilege-may-13-2014-60734e15-af79-26ca-ea53-8cd617073c30)**. С 2014 года GPO не содержат паролей (удален аттрибут CPassword), которые ранее использовались к примеру для установки пароля локального администратора. Рекомендуется использовать [Local admin password solution](https://www.microsoft.com/en-us/download/details.aspx?id=46899).
+
+**Сводка безопасности [MS16-072](https://support.microsoft.com/en-us/topic/ms16-072-security-update-for-group-policy-june-14-2016-7570425d-d460-3003-b2ac-a464c874725d)**. Для GPO необходимо добавлять разрешение группе *Прошедшие проверку* или *Компьютеры домена* на *Чтение*, т.к. чтение групповых политик осуществляется в контексте компьютера, а не пользователя.
+
+**Сводка безопасности [MS17-010](https://support.microsoft.com/en-us/topic/ms17-010-security-update-for-windows-smb-server-march-14-2017-435c22fb-5f9b-f0b3-3c4b-b605f4e6a655)**. Начиная с Windows 10 версии 1709 по-умолчанию отключен протокол SMBv1, что отключает Просмотр сетевого окружения и работу с Windows Server 2003.
+Однако, если вам все еще нужно использовать сетевой проводник для поиска компьютеров Windows, можно выполнить эти шаги на компьютерах Windows, которые больше не используют протокол SMBv1:
+1. Запустите службы "Хост поставщика службы обнаружения" (Function Discovery Provider Host, fdPHost) и "Публикация ресурсов обнаружения функции" (Function Discovery Resource Publication, FDResPub), затем задайте для них параметр "Автоматически (отложенный запуск)."
+2. При открытии сетевого окружения включите обнаружение сети после соответствующего запроса.
+
+**[Удаленный диспетчер устройств](https://learn.microsoft.com/en-US/troubleshoot/windows-server/system-management-components/error-connect-device-manager-remotely)**. Начиная с Windows 8 отключена поддержка удаленного доступа к PnP из соображений безопасности (нельзя подключиться к диспетчеру устройств)
+
+**[Баг с WSUS и Windows 10 LTSB 2016](https://social.technet.microsoft.com/Forums/windowsserver/en-US/5521e7f1-fa2d-4867-a47c-b276c66e6a82/windows-10-anniversary-update-1607)**. Windows 10 1607 до билда 14393.222 (September 29, 2016 — KB3194496) не обновляется с WSUS сервера, необходима установка накопительного обновления и обновления стека обслуживания вручную, например:
+```
+dism.exe /online /add-package /packagepath:"C:\Temp\Windows10-KB3194496-x64.cab" /quiet /norestart /logpath:"C:\Logs\KB3194496.log"
+```
