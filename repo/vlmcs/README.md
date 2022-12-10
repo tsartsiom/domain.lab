@@ -15,8 +15,9 @@ sudo chown -R vlmcsd:vlmcsd /var/log/vlmcsd
 # Указываем LogFile = /var/log/vlmcsd/vlmcsd.log
 sudo nano /etc/vlmcsd/vlmcsd.ini
 
-# Указываем vlmcsd в качестве юзера и группы для [Service]
+# Указываем vlmcsd в [Service] для User и Group
 sudo systemctl edit vlmcsd.service
+sudo systemctl daemon-reload
 sudo systemctl restart vlmcsd.service
 
 # проверяем порты и логи

@@ -64,7 +64,7 @@ net.ipv6.conf.tun0.disable_ipv6 = 1
 EOF
 ```
 
-Добавляем запрет на работу IPv6 в конфигурацию grub. Открываем конфиг */etc/default/grub* и добавляем к параметру GRUB_CMDLINE_LINUX еще одно значение **ipv6.disable=1**. Должно получиться примерно так:
+Добавляем запрет на работу IPv6 в конфигурацию grub. Открываем конфиг `sudo nano /etc/default/grub` и добавляем к параметру GRUB_CMDLINE_LINUX еще одно значение **ipv6.disable=1**. Должно получиться примерно так:
 ```bash
 GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1 quiet"
 GRUB_CMDLINE_LINUX="ipv6.disable=1"

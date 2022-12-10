@@ -18,7 +18,8 @@ Restart-Computer
 
 ```powershell
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools
-Install-ADDSDomainController -InstallDns -DomainName "domain.lab"
+$cred = Get-Credential "DOMAIN\Администратор"
+Install-ADDSDomainController -InstallDns -DomainName "domain.lab" -Credential $cred
 ```
 #### Настройка DNS, установка и настройка DHCP
 
