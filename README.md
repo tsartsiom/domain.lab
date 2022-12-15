@@ -69,3 +69,5 @@
 ```
 dism.exe /online /add-package /packagepath:"C:\Temp\Windows10-KB3194496-x64.cab" /quiet /norestart /logpath:"C:\Logs\KB3194496.log"
 ```
+
+**[Ошибка подключения по RDP к серверу без обновлений после 2018 г.](https://winitpro.ru/index.php/2018/05/11/rdp-auth-oshibka-credssp-encryption-oracle-remediation)** После установки обновлений безопасности Windows, которые вышли после мая 2018 года, вы можете столкнуться с ошибкой **CredSSP encryption oracle remediation** при RDP подключении к удаленному серверу и компьютеру Windows. Разрешить **на клиенте** подключаться на серверы без обновлений через **`gpedit.msc`**: ``Конфигурация компьютера -> Административные шаблоны -> Система -> Передача учетных данных -> Исправление уязвимости шифрующего оракула -> Оставить уязвимость``.
