@@ -28,7 +28,7 @@ Install-ADDSForest -DomainName "domain.lab" -InstallDns -SafeModeAdministratorPa
 #### Настройка DNS, установка и настройка DHCP
 
 ```powershell
-# Создание зоны обратного просмотреа DNS
+# Создание зоны обратного просмотра DNS
 Add-DnsServerPrimaryZone -NetworkID "192.168.69.0/24" -ReplicationScope Forest
 # DHCP
 Install-WindowsFeature -Name DHCP -IncludeManagementTools
