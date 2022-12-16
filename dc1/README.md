@@ -48,7 +48,7 @@ $domainCN = "DC=domain,DC=lab"
 New-ADOrganizationalUnit -Name "Domain Users" -Path $domainCN
 New-ADOrganizationalUnit -Name "Domain Computers" -Path $domainCN
 New-ADOrganizationalUnit -Name "Domain Servers" -Path $domainCN
-# перенаправление новых компов в OU Domain Computers
+# перенаправление новых ПК в OU Domain Computers
 redircmp "OU=Domain Computers,$domainCN"
 ```
 
