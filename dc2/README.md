@@ -11,6 +11,8 @@ Set-DnsClientServerAddress -InterfaceAlias "Ethernet0" -ServerAddresses 192.168.
 New-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\" -Name "DisabledComponents" -Value 0xffffffff -PropertyType "DWord"
 # GLVK ключ для Windows Server 2022 Standard
 slmgr.vbs -ipk VDYBN-27WPP-V4HQT-9VMD4-VMK7H
+# GLVK ключ для Windows Server 2022 Datacenter
+#slmgr.vbs -ipk WX4NM-KYWYW-QJJR4-XV3QB-6VM33
 Restart-Computer -Confirm
 ```
 ## Настройка AD
