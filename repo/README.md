@@ -14,9 +14,9 @@ usermod -aG sudo repoadmin
 
 Отключаем IPv6 у демона *sshd* и запрещаем вход рута по ssh
 ```bash
-sudo sed 's/#AddressFamily any/AddressFamily inet/' -i /etc/ssh/sshd_config
-sudo sed 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' -i /etc/ssh/sshd_config
-sudo sed 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' -i /etc/ssh/sshd_config
+sed -ri 's/^#?AddressFamily.*/AddressFamily inet/g' /etc/ssh/sshd_config
+sed -ri 's/^#?ListenAddress 0.*/ListenAddress 0.0.0.0/g' /etc/ssh/sshd_config
+sed -ri 's/^#?PermitRootLogin.*/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
 ```
 
 Авторизация по публичному ключу пользователя *repoadmin*
