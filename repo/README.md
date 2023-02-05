@@ -160,10 +160,12 @@ sudo systemctl restart nftables.service
 `sudo apt install apt-mirror`
 
 Включаем для синхронизации следующие репозитории:
-- Стандартные Debian (`mirror.datacenter.by`)
+- Debian 11 (`mirror.datacenter.by`)
+- Ubuntu 18.04 LTS, 20.04 LTS, 22.04 LTS (`mirror.datacenter.by`)
 - Zabbix (`repo.zabbix.com`)
 - Proxmox (`download.proxmox.com`)
 - Matrix Synapse (`packages.matrix.org`)
+- Docker (`download.docker.com`)
 
 Для этого изменяем файл `sudo nano /etc/apt/mirror.list`, удаляя стандартные репозитории и добавляя наши. В `base_path` указываем место хранения скачанных репозиториев:
 
@@ -184,20 +186,53 @@ set _tilde 0
 #
 ############# end config ##############
 
-deb-amd64 http://mirror.datacenter.by/debian bullseye main contrib non-free
-deb-amd64 http://mirror.datacenter.by/debian-security bullseye-security main contrib non-free
-deb-amd64 http://mirror.datacenter.by/debian bullseye-updates main contrib non-free
+# Debian 11 (Bullseye)
+deb-amd64 https://mirror.datacenter.by/debian bullseye main contrib non-free
+deb-amd64 https://mirror.datacenter.by/debian bullseye-updates main contrib non-free
+deb-amd64 https://mirror.datacenter.by/debian-security bullseye-security main contrib non-free
+# Ubuntu 22.04 LTS (Jammy Jellyfish)
+deb-amd64 https://mirror.datacenter.by/ubuntu/ jammy main restricted universe multiverse
+deb-amd64 https://mirror.datacenter.by/ubuntu/ jammy-updates main restricted universe multiverse
+deb-amd64 https://mirror.datacenter.by/ubuntu/ jammy-security main restricted universe multiverse
+# Ubuntu 20.04 LTS (Focal Fossa)
+deb-amd64 https://mirror.datacenter.by/ubuntu/ focal main restricted universe multiverse
+deb-amd64 https://mirror.datacenter.by/ubuntu/ focal-updates main restricted universe multiverse
+deb-amd64 https://mirror.datacenter.by/ubuntu/ focal-security main restricted universe multiverse
+# Ubuntu 18.04 LTS (Bionic Beaver)
+deb-amd64 https://mirror.datacenter.by/ubuntu/ bionic main restricted universe multiverse
+deb-amd64 https://mirror.datacenter.by/ubuntu/ bionic-updates main restricted universe multiverse
+deb-amd64 https://mirror.datacenter.by/ubuntu/ bionic-security main restricted universe multiverse
+# Zabbix
 deb-amd64 https://repo.zabbix.com/zabbix/6.2/debian bullseye main
+deb-amd64 https://repo.zabbix.com/zabbix/6.2/ubuntu jammy main
+deb-amd64 https://repo.zabbix.com/zabbix/6.2/ubuntu focal main
+deb-amd64 https://repo.zabbix.com/zabbix/6.2/ubuntu bionic main
+# Proxmox (Only Debian)
 deb-amd64 http://download.proxmox.com/debian/pve bullseye pve-no-subscription
 deb-amd64 http://download.proxmox.com/debian/pbs bullseye pbs-no-subscription
+# Matrix
 deb-amd64 https://packages.matrix.org/debian bullseye main
+deb-amd64 https://packages.matrix.org/debian jammy main
+deb-amd64 https://packages.matrix.org/debian focal main
+deb-amd64 https://packages.matrix.org/debian bionic main
+# Docker
+deb-amd64 https://download.docker.com/linux/debian bullseye stable
+deb-amd64 https://download.docker.com/linux/ubuntu jammy stable
+deb-amd64 https://download.docker.com/linux/ubuntu focal stable
+deb-amd64 https://download.docker.com/linux/ubuntu bionic stable
 
-clean http://mirror.datacenter.by/debian
-clean http://mirror.datacenter.by/debian-security
-clean https://repo.zabbix.com/zabbix/6.2/debian
-clean http://download.proxmox.com/debian/pve
-clean http://download.proxmox.com/debian/pbs
-clean https://packages.matrix.org/debian
+clean https://mirror.datacenter.by
+clean https://repo.zabbix.com
+clean http://download.proxmox.com
+clean https://packages.matrix.org
+clean https://download.docker.com
+```
+
+Скачивание gpg ключа
+
+```bash
+curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /media/share/keys/docker.gpg
+wget -O /media/share/keys/matrix-org-archive-keyring.gpg https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg
 ```
 
 ### Доступ на сервере *repo.domain.lab* по SMB3 к файловому серверу *fs1.domain.lab*
@@ -216,6 +251,7 @@ sudo chmod 400 /home/.smbcredentials
 ```
 
 Установка пакета `cifs-utils`:
+
 ```bash
 sudo apt install cifs-utils
 sudo mkdir -p /media/share
@@ -223,6 +259,7 @@ sudo mount -t cifs -o rw,vers=3.0,credentials=/home/.smbcredentials //fs1.domain
 ```
 
 Включение автоматического монтирования файловой при старте системы (обращаем внимание на то, чтобы в файле `/etc/network/interfaces` был параметр `auto enp0s3`)
+
 ```bash
 sudo bash -c "cat >> /etc/fstab" << EOF
 //fs1.domain.lab/repo /media/share cifs vers=3.0,credentials=/home/.smbcredentials,_netdev,noperm 0 0
@@ -245,18 +282,22 @@ sudo chown -R www-data:www-data /var/www/repo.domain.lab/html
 sudo chmod -R 755 /var/www/repo.domain.lab
 
 # Добавляем каталоги скачанных репозиториев
-sudo ln -s /media/share/mirror/mirror.datacenter.by/debian /var/www/repo.domain.lab/html/debian
-sudo ln -s /media/share/mirror/mirror.datacenter.by/debian-security /var/www/repo.domain.lab/html/debian-security
-sudo ln -s /media/share/mirror/repo.zabbix.com/zabbix /var/www/repo.domain.lab/html/zabbix
-sudo ln -s /media/share/mirror/download.proxmox.com /var/www/repo.domain.lab/html/proxmox
-sudo ln -s /media/share/mirror/packages.matrix.org /var/www/repo.domain.lab/html/matrix
-sudo ln -s /media/share/keys /var/www/repo.domain.lab/html/keys
-sudo ln -s /media/share/centos /var/www/repo.domain.lab/html/centos
+local_path='/media/share'
+web_path='/var/www/repo.domain.lab/html'
+sudo ln -s $local_path/mirror/mirror.datacenter.by/debian $web_path/debian
+sudo ln -s $local_path/mirror/mirror.datacenter.by/debian-security $web_path/debian-security
+sudo ln -s $local_path/mirror/mirror.datacenter.by/ubuntu $web_path/ubuntu
+sudo ln -s $local_path/mirror/repo.zabbix.com/zabbix $web_path/zabbix
+sudo ln -s $local_path/mirror/download.proxmox.com $web_path/proxmox
+sudo ln -s $local_path/mirror/packages.matrix.org $web_path/matrix
+sudo ln -s $local_path/mirror/download.docker.com/linux $web_path/docker
+sudo ln -s $local_path/keys $web_path/keys
+sudo ln -s $local_path/centos $web_path/centos
 
 # Создаем файл конфигурации для nginx
 sudo bash -c "cat > /etc/nginx/sites-available/repo.domain.lab" << EOF
 server {
-  listen 80;
+  listen 80 default_server;
   root /var/www/repo.domain.lab/html;
   index index.html;
   server_name repo.domain.lab;
@@ -277,26 +318,30 @@ sudo systemctl restart nginx
 # Debian
 sudo bash -c "cat > /etc/apt/sources.list.d/repo.domain.lab-debian.list" << EOF
 deb http://repo.domain.lab/debian bullseye main contrib non-free
-deb http://repo.domain.lab/debian-security bullseye-security main contrib non-free
 deb http://repo.domain.lab/debian bullseye-updates main contrib non-free
+deb http://repo.domain.lab/debian-security bullseye-security main contrib non-free
 EOF
 
-# zabbix
+# Zabbix
 echo "deb http://repo.domain.lab/zabbix/6.2/debian bullseye main" | sudo tee /etc/apt/sources.list.d/repo.domain.lab-zabbix.list
 
-# proxmox
+# Proxmox
 sudo bash -c "cat > /etc/apt/sources.list.d/repo.domain.lab-proxmox.list" << EOF
 deb http://repo.domain.lab/proxmox/debian/pve bullseye pve-no-subscription
 deb http://repo.domain.lab/proxmox/debian/pbs bullseye pbs-no-subscription
 EOF
 
-# matrix
+# Matrix
 echo "deb http://repo.domain.lab/matrix/debian bullseye main" | sudo tee /etc/apt/sources.list.d/repo.domain.lab-matrix.list
+
+# Docker
+echo "deb http://repo.domain.lab/docker/debian bullseye stable" | sudo tee /etc/apt/sources.list.d/repo.domain.lab-docker.list
 
 # gpg ключи
 sudo wget http://repo.domain.lab/keys/zabbix-official-repo.gpg -O /etc/apt/trusted.gpg.d/zabbix-official-repo.gpg
 sudo wget http://repo.domain.lab/keys/proxmox-release-bullseye.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bullseye.gpg
 sudo wget http://repo.domain.lab/keys/matrix-org-archive-keyring.gpg -O /etc/apt/trusted.gpg.d/matrix-org-archive-keyring.gpg
+sudo wget http://repo.domain.lab/keys/docker.gpg -O /etc/apt/trusted.gpg.d/docker.gpg
 ```
 
 ### Использование локального репозитория на *repo*
