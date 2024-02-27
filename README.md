@@ -38,6 +38,9 @@
 - [Документация на Microsoft Exchange Server](https://learn.microsoft.com/en-us/exchange/exchange-server?view=exchserver-2019)
 - [Выпуски Microsoft Exchange Server](https://msexchangeupdates.com)
 
+### CA
+- [Пример настройки](https://learn.microsoft.com/en-us/windows-server/networking/core-network-guide/cncg/server-certs/server-certificate-deployment)
+
 ### SQL Server
 - [Документация на Microsoft SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/?view=sql-server-ver15)
 - [Выпуски Microsoft SQL Server](https://sqlserverbuilds.blogspot.com)

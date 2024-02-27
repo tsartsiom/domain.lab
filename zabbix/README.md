@@ -56,7 +56,7 @@ dns-nameservers 192.168.69.1 192.168.69.2
 Из практических соображений IPv6 в настоящее время на сервере не нужен и его можно отключить.
 
 ```bash
-sudo bash -c "cat >> /etc/sysctl.conf" << EOF
+cat << EOF | sudo tee -a /etc/sysctl.conf
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
@@ -93,7 +93,7 @@ EOF
 
 Создаем файл конфигурации */etc/rsyslog.d/ignore-systemd-session-slice.conf*
 ```bash
-sudo bash -c "cat > /etc/rsyslog.d/ignore-systemd-session-slice.conf" << EOF
+cat << EOF | sudo tee /etc/rsyslog.d/ignore-systemd-session-slice.conf
 if \$programname == "systemd" and (\$msg contains "Starting Session" or \$msg contains "Started Session" or \$msg contains "Created slice" or \$msg contains "Starting user-" or \$msg contains "Starting User Slice of" or \$msg contains "Removed session" or \$msg contains "Removed slice User Slice of" or \$msg contains "Stopping User Slice of") then stop
 EOF
 ```
@@ -114,7 +114,7 @@ sudo systemctl enable nftables.service
 
 Создаем файл конфигурации */etc/nftables.conf*
 ```bash
-sudo bash -c "cat > /etc/nftables.conf" << EOF
+cat << EOF | sudo tee /etc/nftables.conf
 flush ruleset
 
 table inet my_table {

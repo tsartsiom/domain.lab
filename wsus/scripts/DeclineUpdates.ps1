@@ -9,6 +9,8 @@ $excludeArray = @(
   "Windows Server 2008 R2 Beta", 
   "Windows 10 Version Next", 
   "Windows Server Next",
+  "Windows 10 Version 21H1", # End of servicing 2022-12-13
+  "Windows 10 Version 20H2", # End of servicing 2023-05-09
   "Windows 10 Version 2004", # End of servicing 2021-12-14
   "Windows 10 Version 1909", # End of servicing 2022-05-10
   "Windows 10 Version 1903", # End of servicing 2020-12-08
@@ -40,7 +42,7 @@ $excludeArray = @(
   "Skype for Business",
   "Exchange Server (2010 (Service Pack [12])|2010 \()",
   "Exchange Server (2016 (RTM|CU(?!22))|2016 \()",
-  "Exchange Server (2019 (RTM|CU(?!12))|2019 \()",
+  "Exchange Server (2019 (RTM|CU(?!11))|2019 \()",
   "Windows Admin Center 1809"
 )
 

@@ -56,7 +56,7 @@ dns-nameservers 192.168.69.1 192.168.69.2
 Из практических соображений IPv6 в настоящее время на сервере не нужен и его можно отключить.
 
 ```bash
-sudo bash -c "cat >> /etc/sysctl.conf" << EOF
+cat << EOF | sudo tee -a /etc/sysctl.conf
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
@@ -65,6 +65,7 @@ EOF
 ```
 
 Добавляем запрет на работу IPv6 в конфигурацию grub. Открываем конфиг `sudo nano /etc/default/grub` и добавляем к параметру GRUB_CMDLINE_LINUX еще одно значение **ipv6.disable=1**. Должно получиться примерно так:
+
 ```bash
 GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1 quiet"
 GRUB_CMDLINE_LINUX="ipv6.disable=1"
@@ -92,8 +93,9 @@ EOF
 ### Отключение флуда сообщений в */var/log/messages*
 
 Создаем файл конфигурации */etc/rsyslog.d/ignore-systemd-session-slice.conf*
+
 ```bash
-sudo bash -c "cat > /etc/rsyslog.d/ignore-systemd-session-slice.conf" << EOF
+cat << EOF | sudo tee /etc/rsyslog.d/ignore-systemd-session-slice.conf
 if \$programname == "systemd" and (\$msg contains "Starting Session" or \$msg contains "Started Session" or \$msg contains "Created slice" or \$msg contains "Starting user-" or \$msg contains "Starting User Slice of" or \$msg contains "Removed session" or \$msg contains "Removed slice User Slice of" or \$msg contains "Stopping User Slice of") then stop
 EOF
 ```
@@ -114,7 +116,7 @@ sudo systemctl enable nftables.service
 
 Создаем файл конфигурации */etc/nftables.conf*
 ```bash
-sudo bash -c "cat > /etc/nftables.conf" << EOF
+cat << EOF | sudo tee /etc/nftables.conf
 flush ruleset
 
 table inet my_table {
@@ -242,7 +244,7 @@ wget -O /media/share/keys/matrix-org-archive-keyring.gpg https://packages.matrix
 Для подключения к файловой шаре создаем файл с реквизитами доступа к файловому серверу:
 
 ```bash 
-sudo bash -c "cat > /home/.smbcredentials" << EOF
+cat << EOF | sudo tee /home/.smbcredentials
 username=Администратор
 password=Password1234@!
 domain=domain.lab
@@ -261,7 +263,7 @@ sudo mount -t cifs -o rw,vers=3.0,credentials=/home/.smbcredentials //fs1.domain
 Включение автоматического монтирования файловой при старте системы (обращаем внимание на то, чтобы в файле `/etc/network/interfaces` был параметр `auto enp0s3`)
 
 ```bash
-sudo bash -c "cat >> /etc/fstab" << EOF
+cat << EOF | sudo tee -a /etc/fstab
 //fs1.domain.lab/repo /media/share cifs vers=3.0,credentials=/home/.smbcredentials,_netdev,noperm 0 0
 EOF
 ```
@@ -295,7 +297,7 @@ sudo ln -s $local_path/keys $web_path/keys
 sudo ln -s $local_path/centos $web_path/centos
 
 # Создаем файл конфигурации для nginx
-sudo bash -c "cat > /etc/nginx/sites-available/repo.domain.lab" << EOF
+cat << EOF | sudo tee /etc/nginx/sites-available/repo.domain.lab
 server {
   listen 80 default_server;
   root /var/www/repo.domain.lab/html;
@@ -316,7 +318,7 @@ sudo systemctl restart nginx
 Настраиваем репозитории на клиентских машинах в папке */etc/apt*:
 ```bash
 # Debian
-sudo bash -c "cat > /etc/apt/sources.list.d/repo.domain.lab-debian.list" << EOF
+cat << EOF | sudo tee /etc/apt/sources.list.d/repo.domain.lab-debian.list
 deb http://repo.domain.lab/debian bullseye main contrib non-free
 deb http://repo.domain.lab/debian bullseye-updates main contrib non-free
 deb http://repo.domain.lab/debian-security bullseye-security main contrib non-free
@@ -326,7 +328,7 @@ EOF
 echo "deb http://repo.domain.lab/zabbix/6.2/debian bullseye main" | sudo tee /etc/apt/sources.list.d/repo.domain.lab-zabbix.list
 
 # Proxmox
-sudo bash -c "cat > /etc/apt/sources.list.d/repo.domain.lab-proxmox.list" << EOF
+cat << EOF | sudo tee /etc/apt/sources.list.d/repo.domain.lab-proxmox.list
 deb http://repo.domain.lab/proxmox/debian/pve bullseye pve-no-subscription
 deb http://repo.domain.lab/proxmox/debian/pbs bullseye pbs-no-subscription
 EOF
@@ -357,7 +359,7 @@ sudo dpkg --install cifs-utils_6.11-3.1+deb11u1_amd64.deb
 sudo dpkg --install keyutils_1.6.1-2_amd64.deb
 
 # Создание локального репозитория после подлкючения к шаре
-sudo bash -c "cat > /etc/apt/sources.list.d/local-repo.list" << EOF
+cat << EOF | sudo tee /etc/apt/sources.list.d/local-repo.list
 deb file:/media/share/mirror/mirror.datacenter.by/debian bullseye main contrib non-free
 deb file:/media/share/mirror/mirror.datacenter.by/debian-security bullseye-security main contrib non-free
 deb file:/media/share/mirror/mirror.datacenter.by/debian bullseye-updates main contrib non-free

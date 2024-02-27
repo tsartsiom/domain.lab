@@ -50,6 +50,87 @@ certutil -setreg policy\EditFlags +EDITF_ATTRIBUTESUBJECTALTNAME2
 
 Eсли требуется публиковать на веб-портале шаблоны сертификатов версии 3 и выше, надо в `ADSIedit` установить параметр **`msPKI-Template-Schema-Version`** по пути `Configuration -> Services -> Public Key Services -> Certificate Templates` для нужного шаблона равным **`2`**
 
+#### Настройка публикации списков отзыва
+
+Устанавливаем веб-сервер
+
+```powershell
+Install-WindowsFeature Web-Server -IncludeManagementTools
+```
+
+Создаем алиас (CNAME) в DNS, например `pki.domain.lab`
+
+```powershell
+Add-DnsServerResourceRecordCName -Name "pki" -HostNameAlias "ca.domain.lab" -ZoneName "domain.lab"
+```
+**Настройка IIS**
+
+Список отзыва сертификатов корневого ЦС будет доступен через `https://pki.domain.lab/pki`.
+
+В настоящее время нет виртуального каталога PKI, поэтому его необходимо создать.
+
+`Диспетчер служб IIS` -> `Default Web Site` -> `Добавить виртуальный каталог` -> В псевдоним пишем `pki`. В физическом пути пишем `C:\pki`
+
+Включам анонимный доступ к виртуальной директории 
+`Редактировать разрешения` -> `Безопасность` -> `Изменить` -> `Добавить...` -> `АНОНИМНЫЙ ВХОД; Все`
+
+Выбираем `Фильтрация запросов` -> `Расширения имен файлов` -> `Изменить параметры` -> `Разрешить двойное преобразование`
+
+Перезапускаем IIS.
+
+**Настройка расширений CDP и AIA**
+
+Переходим в свойства CA, вкладка расширения
+
+**Настройка CDP**
+
+**Удалем** строки:
+```
+file://\\<ServerDNSName>\CertEnroll\<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
+http://<ServerDNSName>/CertEnroll/<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
+ldap:///CN=<CATruncatedName><CRLNameSuffix>,CN=<ServerShortName>
+```
+
+**Добавляем** следующие строки:
+```
+http://pki.domain.lab/pki/<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
+```
+Выбираем 
+- `Включить в CRLs. Клиенты используют данные для поиска в размещениях Delta CRL`
+- `Включить в CDP-расширения выданных сертификатов`
+
+```
+file://С:\pki\<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
+```
+Выбираем 
+- `Опубликовать CRL по данному адресу`
+- `Публикация разностных CRLs по адресу`
+
+**Настройка AIA**
+
+**Удалем** строки:
+```
+ldap:///CN=<CATruncatedName>,CN=AIA,CN=Public Key Services
+http://<ServerDNSName>/CertEnroll/<ServerDNSName>_<CaName><CertificateName>.crt
+file://\\<ServerDNSName>\CertEnroll\<ServerDNSName><CaName><CertificateName>.crt
+```
+
+**Добавляем** следующие строки:
+```
+http://pki.domain.lab/pki/<ServerDNSName>_<CaName><CertificateName>.crt
+```
+Выбираем 
+- `Включать в AIA-расширение выданных сертификатов`
+
+**Копириуем списки отзыва сертификатов**
+
+```
+certutil -crl
+copy C:\Windows\system32\certsrv\certenroll\*.crt C:\pki
+copy C:\Windows\system32\certsrv\certenroll\*.crl C:\pki
+pkiview.msc
+```
+
 #### Выдача сертификатов по файлам CSR (*.req)
 
 - C указанием шаблона и SAN
