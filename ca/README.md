@@ -100,7 +100,7 @@ http://pki.domain.lab/pki/<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
 - `Включить в CDP-расширения выданных сертификатов`
 
 ```
-file://С:\pki\<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
+file://C:\pki\<CaName><CRLNameSuffix><DeltaCRLAllowed>.crl
 ```
 Выбираем 
 - `Опубликовать CRL по данному адресу`
@@ -131,17 +131,30 @@ copy C:\Windows\system32\certsrv\certenroll\*.crl C:\pki
 pkiview.msc
 ```
 
+#### Пример запроса сертификата OpenSSL
+
+```
+openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr -addext "basicConstraints = critical, CA:FALSE" -addext "keyUsage = critical, digitalSignature, keyEncipherment" -addext "extendedKeyUsage = serverAuth, clientAuth" -addext "subjectAltName = DNS:server.domain.lab"
+```
+
+#### Просмотр информации о запросе на выдачу сертификата
+
+```
+certutil -dump request.req
+```
+
+
 #### Выдача сертификатов по файлам CSR (*.req)
 
-- C указанием шаблона и SAN
+- Без указания шаблона и SAN
 ```
-certreq -submit -attrib "CertificateTemplate:ИМЯ_ШАБЛОНА\nsan:dns=АДРЕС_СЕРВЕРА&ipaddress=IP_СЕРВЕРА"
+certreq -submit
 ```
 - C указанием шаблона (SAN в запросе *.req)
 ```
 certreq -submit -attrib "CertificateTemplate:ИМЯ_ШАБЛОНА"
 ```
-- Без указания шаблона и SAN (шаблон и SAN в запросе *.req)
+- C указанием шаблона и SAN
 ```
-certreq -submit
+certreq -submit -attrib "CertificateTemplate:ИМЯ_ШАБЛОНА\nsan:dns=АДРЕС_СЕРВЕРА&ipaddress=IP_СЕРВЕРА"
 ```

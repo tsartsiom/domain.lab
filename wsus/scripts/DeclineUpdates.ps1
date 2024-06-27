@@ -1,13 +1,9 @@
-﻿[reflection.assembly]::LoadWithPartialName("Microsoft.UpdateServices.Administration") | out-null
+[reflection.assembly]::LoadWithPartialName("Microsoft.UpdateServices.Administration") | out-null
 $wsus = [Microsoft.UpdateServices.Administration.AdminProxy]::GetUpdateServer("localhost", $false, "8530")
 
 $excludeArray = @(
-  "Itanium", 
-  "IA64", 
-  "ARM64", 
-  "Windows 7 Beta", 
-  "Windows Server 2008 R2 Beta", 
-  "Windows 10 Version Next", 
+  "ARM64",
+  "Windows 10 Version Next",
   "Windows Server Next",
   "Windows 10 Version 21H1", # End of servicing 2022-12-13
   "Windows 10 Version 20H2", # End of servicing 2023-05-09
@@ -18,32 +14,19 @@ $excludeArray = @(
   "Windows 10 Version 1709", # End of servicing 2020-10-13
   "Windows 10 Version 1703", # End of servicing 2019-10-08
   "Windows 10 Version 1511", # End of servicing 2018-04-10
-  "Security Only Quality", 
-  "Preview of Monthly", 
-  "Internet Explorer", 
-  "SharePoint", 
-  "farm-deployment", 
-  "Groove", 
-  "Business Productivity", 
-  "Search Server", 
-  "Project Server", 
-  "Publisher", 
-  "Web App", 
-  "SkyDrive", 
-  "Web Apps Server", 
-  "Lync", 
-  "Online Server", 
-  "Social Connector", 
-  "OneDrive for Business", 
-  "InfoPath", 
-  "OneNote", 
-  "Microsoft Project", 
-  "Web Applications", 
+  "Security Only Quality",
+  "Internet Explorer",
+  "SharePoint",
+  "farm-deployment",
+  "Publisher",
+  "Online Server",
+  "OneDrive for Business",
+  "OneNote",
+  "Microsoft Project",
   "Skype for Business",
   "Exchange Server (2010 (Service Pack [12])|2010 \()",
-  "Exchange Server (2016 (RTM|CU(?!22))|2016 \()",
-  "Exchange Server (2019 (RTM|CU(?!11))|2019 \()",
-  "Windows Admin Center 1809"
+  "Exchange Server (2016 (RTM|CU(?!23))|2016 \()",
+  "Exchange Server (2019 (RTM|CU(?!14))|2019 \()"
 )
 
 Write-Host ""
@@ -90,8 +73,3 @@ Write-Host ""
 $total = $countExcluded+$countSuperseded
 Write-Host "TOTAL Declined" $total "Updates."
 Write-Host ""
-
-Write-Host "Restoring Windows 7 January 2020 Updates (KB4534310, KB4536952)..."
-$restored = $allUpdates | Where-Object {($_.KnowledgebaseArticles -eq "4534310" -or $_.KnowledgebaseArticles -eq "4536952") -and $_.Title -notlike "*Itanium*"}
-$restored | ForEach-Object { Get-WsusUpdate -UpdateServer $wsus -UpdateId $_.Id.UpdateID | Approve-WsusUpdate -Action NotApproved -TargetGroupName "Неназначенные компьютеры"}
-Write-Host "Restored" $restored.Count "Windows 7 Updates."

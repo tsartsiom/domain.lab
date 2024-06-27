@@ -1,4 +1,4 @@
-﻿[reflection.assembly]::LoadWithPartialName("Microsoft.UpdateServices.Administration") | out-null
+[reflection.assembly]::LoadWithPartialName("Microsoft.UpdateServices.Administration") | out-null
 $wsus = [Microsoft.UpdateServices.Administration.AdminProxy]::GetUpdateServer("localhost", $false, "8530")
 
 $config = $wsus.GetConfiguration()
